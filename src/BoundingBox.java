@@ -1,10 +1,17 @@
 public class BoundingBox {
   private Point bottomLeftPoint;
   private Point topRightPoint;
+  private double minX, minY, maxX, maxY;
 
   public BoundingBox(Point bottomLeftPoint, Point topRightPoint) {
     this.bottomLeftPoint = bottomLeftPoint;
     this.topRightPoint = topRightPoint;
+
+    minX = bottomLeftPoint.getLng();
+    minY = bottomLeftPoint.getLat();
+
+    maxX = topRightPoint.getLng();
+    maxY = topRightPoint.getLat();
   }
 
   public Point getBottomLeftPoint() {
@@ -16,42 +23,52 @@ public class BoundingBox {
   }
 
   public boolean overlaps(BoundingBox other) {
-    double minX = bottomLeftPoint.getLng();
-    double minY = bottomLeftPoint.getLat();
+    if (minX > other.getMaxX()) return false;
 
-    double maxX = topRightPoint.getLng();
-    double maxY = topRightPoint.getLat();
+    if (maxX < other.getMinX()) return false;
 
-    double otherMinX = other.getBottomLeftPoint().getLng();
-    double otherMinY = other.getBottomLeftPoint().getLat();
+    if (minY > other.getMaxY()) return false;
 
-    double otherMaxX = other.getTopRightPoint().getLng();
-    double otherMaxY = other.getTopRightPoint().getLat();
-
-    if(minX > otherMaxX) return false;
-
-    if(maxX < otherMinX) return false;
-
-    if(minY > otherMaxY) return false;
-
-    if(maxY < otherMinY) return false;
+    if (maxY < other.getMinY()) return false;
 
     return true;
   }
 
   public boolean contains(BoundingBox other) {
-    double minX = bottomLeftPoint.getLng();
-    double minY = bottomLeftPoint.getLat();
+    return minX <= other.getMinX() && maxX >= other.getMaxX() && minY <= other.getMinY()
+        && maxY >= other.getMaxY();
+  }
 
-    double maxX = topRightPoint.getLng();
-    double maxY = topRightPoint.getLat();
+  public double calculateEnlargement(BoundingBox other) {
+    double currentArea = getArea();
+    // build new bounding box
+    double newMinX = Math.min(minX, other.getMinX());
+    double newMinY = Math.min(minY, other.getMinY());
+    double newMaxX = Math.max(maxX, other.getMaxX());
+    double newMaxY = Math.max(maxY, other.getMaxY());
 
-    double otherMinX = other.getBottomLeftPoint().getLng();
-    double otherMinY = other.getBottomLeftPoint().getLat();
+    double newArea = (newMaxX - newMinX) * (newMaxY - newMinY);
 
-    double otherMaxX = other.getTopRightPoint().getLng();
-    double otherMaxY = other.getTopRightPoint().getLat();
+    return newArea - currentArea;
+  }
 
-    return minX <= otherMinX && maxX >= otherMaxX && minY <= otherMinY && maxY >= otherMaxY;
+  public double getArea() {
+    return (maxX - minX) * (maxY - minY);
+  }
+
+  public double getMinX() {
+    return minX;
+  }
+
+  public double getMinY() {
+    return minY;
+  }
+
+  public double getMaxX() {
+    return maxX;
+  }
+
+  public double getMaxY() {
+    return maxY;
   }
 }

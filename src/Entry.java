@@ -1,19 +1,13 @@
 // leaf node entry (mbb, object)
-public class Entry {
-  private BoundingBox mbb;
+public class Entry extends BoundedObject {
   private BoundedObject object;
   private Node parent;
 
   public Entry(BoundedObject object) {
     this.object = object;
-    this.mbb = object.getBBox();
   }
 
   public Entry() {
-  }
-
-  public BoundingBox getMbb() {
-    return mbb;
   }
 
   public BoundedObject getObject() {
@@ -26,5 +20,12 @@ public class Entry {
 
   public void setParent(Node parent) {
     this.parent = parent;
+  }
+
+  @Override
+  BoundingBox calculateBBox() {
+    bbox = object.getBBox();
+
+    return bbox;
   }
 }

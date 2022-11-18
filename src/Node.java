@@ -1,10 +1,11 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class Node {
+public class Node extends BoundedObject {
   private Node parent;
-  // directory rectangle = bbox(E)
-  private BoundingBox bbox;
   private List<Node> nodeEntries;
   private List<Entry> leafEntries;
 
@@ -12,6 +13,12 @@ public class Node {
 
   public Node() {
     isLeaf = false;
+    nodeEntries = new ArrayList<>();
+    leafEntries = new ArrayList<>();
+  }
+
+  public Node(boolean isLeaf) {
+    this.isLeaf = isLeaf;
     nodeEntries = new ArrayList<>();
     leafEntries = new ArrayList<>();
   }
@@ -38,5 +45,21 @@ public class Node {
 
   public void setIsLeaf(boolean leaf) {
     isLeaf = leaf;
+  }
+
+  public Node getParent() {
+    return parent;
+  }
+
+  public void setParent(Node parent) {
+    this.parent = parent;
+  }
+
+  @Override
+  BoundingBox calculateBBox() {
+    List<? extends BoundedObject> entries = isLeaf ? leafEntries : nodeEntries;
+    bbox = calculateBBox(entries);
+
+    return bbox;
   }
 }
