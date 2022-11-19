@@ -26,7 +26,7 @@ public class Main {
   private static Entry prepareLinestring(String id, List<double[]> arg) {
     List<Point> points = new ArrayList<>();
     for (double[] coord : arg) {
-      points.add(new Point(coord[0], coord[1]));
+      points.add(new Point(coord[1], coord[0]));
     }
 
     Linestring linestring = new Linestring(points);

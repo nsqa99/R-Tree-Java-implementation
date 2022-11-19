@@ -24,12 +24,14 @@ public class RTree {
     if (rootNode == null) {
       rootNode = new Node(isRootAlsoLeafNode);
       rootNode.setId("root");
+
       Node childNode = new Node(true);
       childNode.setId(UUID.randomUUID().toString());
       childNode.setParent(rootNode);
       childNode.getLeaveEntries().add(entry);
+
       rootNode.getNodeEntries().add(childNode);
-      adjustPath(childNode);
+      updateMBB(childNode);
 
       return;
     }
@@ -45,7 +47,7 @@ public class RTree {
     if (node.getLeaveEntries().size() > maxEntry) {
       splitAndAdjust(node);
     } else {
-      adjustPath(node);
+      updateMBB(node);
     }
   }
 
@@ -56,7 +58,7 @@ public class RTree {
     if (parent == null) {
       // create new root
       parent = new Node();
-      node.setId("old root");
+      node.setId(UUID.randomUUID().toString());
       node.setParent(parent);
       parent.getNodeEntries().add(node);
       this.rootNode = parent;
@@ -78,8 +80,8 @@ public class RTree {
 
     parent.getNodeEntries().add(newNode);
 
-    adjustPath(node);
-    adjustPath(newNode);
+    updateMBB(node);
+    updateMBB(newNode);
 
     // split parent if needed
     if (parent.getNodeEntries().size() > maxEntry) {
@@ -202,12 +204,12 @@ public class RTree {
     }
   }
 
-  private void adjustPath(Node node) {
+  private void updateMBB(Node node) {
     // return if meet root node
     if (node.getParent() == null) return;
 
     node.calculateBBox();
-    adjustPath(node.getParent());
+    updateMBB(node.getParent());
   }
 
   private Node chooseSubTree(Node node, Entry entry) {
