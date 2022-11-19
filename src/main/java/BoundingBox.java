@@ -87,12 +87,12 @@ public class BoundingBox {
   }
 
   private double getHaversineDistance(double lat1, double lng1, double lat2, double lng2) {
-    double dLat = Math.toRadians(lat2 - lat1);
-    double dLng = Math.toRadians(lng2 - lng1);
+    double dLat = Math.toRadians(lat2 - lat1); // delta lat
+    double dLng = Math.toRadians(lng2 - lng1); // delta lng
     double a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
             Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+                Math.sin(dLng / 2) * Math.sin(dLng / 2); // sin^2(deltaLat / 2) + cos(lat1) * cos(lat2) * sin^2(deltaLng / 2)
 
     double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
