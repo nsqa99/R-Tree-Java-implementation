@@ -59,6 +59,7 @@ public class Node extends BoundedObject {
   BoundingBox calculateBBox() {
     List<? extends BoundedObject> entries = isLeaf ? leafEntries : nodeEntries;
     bbox = calculateBBox(entries);
+    bbox.calculateArea();
 
     return bbox;
   }

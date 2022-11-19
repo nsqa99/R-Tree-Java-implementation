@@ -2,6 +2,8 @@ public class BoundingBox {
   private Point bottomLeftPoint;
   private Point topRightPoint;
   private double minX, minY, maxX, maxY;
+  private Double area;
+  private static final int EARTH_RADIUS = 6371; // Radius of the earth in km
 
   public BoundingBox(Point bottomLeftPoint, Point topRightPoint) {
     this.bottomLeftPoint = bottomLeftPoint;
@@ -47,13 +49,25 @@ public class BoundingBox {
     double newMaxX = Math.max(maxX, other.getMaxX());
     double newMaxY = Math.max(maxY, other.getMaxY());
 
-    double newArea = (newMaxX - newMinX) * (newMaxY - newMinY);
+    double newXAxisLength = getHaversineDistance(newMinY, newMinX, newMinY, newMaxX);
+    double newYAxisLength = getHaversineDistance(newMinY, newMinX, newMaxY, newMinX);
 
-    return newArea - currentArea;
+    return newXAxisLength * newYAxisLength - currentArea;
   }
 
   public double getArea() {
-    return (maxX - minX) * (maxY - minY);
+    if (area == null) {
+      calculateArea();
+    }
+
+    return area;
+  }
+
+  public void calculateArea() {
+    double xAxisLength = getHaversineDistance(minY, minX, minY, maxX);
+    double yAxisLength = getHaversineDistance(minY, minX, maxY, minX);
+
+    area = xAxisLength * yAxisLength;
   }
 
   public double getMinX() {
@@ -70,5 +84,18 @@ public class BoundingBox {
 
   public double getMaxY() {
     return maxY;
+  }
+
+  private double getHaversineDistance(double lat1, double lng1, double lat2, double lng2) {
+    double dLat = Math.toRadians(lat2 - lat1);
+    double dLng = Math.toRadians(lng2 - lng1);
+    double a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return EARTH_RADIUS * c;
   }
 }
