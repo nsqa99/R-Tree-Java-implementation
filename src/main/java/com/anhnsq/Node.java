@@ -1,15 +1,14 @@
+package com.anhnsq;
+
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Node extends BoundedObject {
   private Node parent;
   private List<Node> nodeEntries;
-  private List<Entry> leafEntries;
+  protected List<Entry> leafEntries;
 
-  private boolean isLeaf;
+  protected boolean isLeaf;
 
   public Node() {
     isLeaf = false;

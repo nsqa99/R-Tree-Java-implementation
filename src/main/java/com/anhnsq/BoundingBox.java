@@ -1,3 +1,5 @@
+package com.anhnsq;
+
 public class BoundingBox {
   private Point bottomLeftPoint;
   private Point topRightPoint;

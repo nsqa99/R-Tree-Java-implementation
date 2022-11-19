@@ -1,3 +1,5 @@
+package com.anhnsq;
+
 // leaf node entry (mbb, object)
 public class Entry extends BoundedObject {
   private BoundedObject object;

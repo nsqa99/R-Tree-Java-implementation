@@ -1,3 +1,7 @@
+package com.anhnsq.quadtree;
+
+import com.anhnsq.*;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -7,13 +11,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Main {
   public static void main(String[] args) {
     List<List<double[]>> entries = readDataFromFile();
 
-    RTree tree = new RTree(false, 4, 2);
+    QuadTree tree = new QuadTree(4);
 
     for (int i = 0; i < entries.size(); i++) {
       tree.insert(prepareLinestring("e" + (i + 1), entries.get(i)));

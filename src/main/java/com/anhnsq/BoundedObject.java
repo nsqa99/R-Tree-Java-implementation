@@ -1,3 +1,5 @@
+package com.anhnsq;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -15,6 +17,10 @@ public abstract class BoundedObject {
     }
 
     return this.bbox;
+  }
+
+  public void setBbox(BoundingBox bbox) {
+    this.bbox = bbox;
   }
 
   public static BoundingBox calculateBBox(List<? extends BoundedObject> entries) {

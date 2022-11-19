@@ -1,10 +1,12 @@
+package com.anhnsq;
+
 public class Point extends BoundedObject {
   private double lat;
   private double lng;
 
   @Override
   public String toString() {
-    return "Point{" +
+    return "com.anhnsq.Point{" +
         "lat=" + lat +
         ", lng=" + lng +
         '}';
