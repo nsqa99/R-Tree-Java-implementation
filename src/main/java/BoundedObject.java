@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class BoundedObject {
+  protected String id;
+
   protected BoundingBox bbox;
   abstract BoundingBox calculateBBox();
 
@@ -16,8 +18,15 @@ public abstract class BoundedObject {
   }
 
   public static BoundingBox calculateBBox(List<? extends BoundedObject> entries) {
-    List<BoundingBox> entryBBoxes = entries.stream().map(BoundedObject::getBBox).collect(Collectors.toList());
+    assert !entries.isEmpty();
 
+    List<BoundingBox> entryBBoxes = entries.stream().map(e -> {
+      if (e.getBBox() == null) {
+        System.out.println(e);
+      }
+
+      return e.getBBox();
+    }).collect(Collectors.toList());
     double xMin = Collections.min(entryBBoxes, Comparator.comparingDouble(BoundingBox::getMinX)).getMinX();
     double xMax = Collections.max(entryBBoxes, Comparator.comparingDouble(BoundingBox::getMaxX)).getMaxX();
 
@@ -26,4 +35,13 @@ public abstract class BoundedObject {
 
     return new BoundingBox(new Point(yMin, xMin), new Point(yMax, xMax));
   }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
 }

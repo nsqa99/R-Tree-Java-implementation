@@ -1,25 +1,37 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class RTree {
   private Node rootNode;
+  private final boolean isRootAlsoLeafNode;
+
+  public Node getRootNode() {
+    return rootNode;
+  }
 
   private final int maxEntry;
   private final int minEntry;
 
-  public RTree(int maxEntry, int minEntry) {
+  public RTree(boolean isRootAlsoLeafNode, int maxEntry, int minEntry) {
+    this.isRootAlsoLeafNode = isRootAlsoLeafNode;
     this.maxEntry = maxEntry;
     this.minEntry = minEntry;
   }
 
-  public void insert(Entry entry, boolean isRootAlsoLeafNode) {
+  public void insert(Entry entry) {
     if (rootNode == null) {
       rootNode = new Node(isRootAlsoLeafNode);
+      rootNode.setId("root");
       Node childNode = new Node(true);
+      childNode.setId(UUID.randomUUID().toString());
       childNode.setParent(rootNode);
-
+      childNode.getLeaveEntries().add(entry);
       rootNode.getNodeEntries().add(childNode);
+      adjustPath(childNode);
+
+      return;
     }
 
     Node node = rootNode;
@@ -44,28 +56,30 @@ public class RTree {
     if (parent == null) {
       // create new root
       parent = new Node();
+      node.setId("old root");
       node.setParent(parent);
+      parent.getNodeEntries().add(node);
+      this.rootNode = parent;
     }
 
     List<? extends BoundedObject> currentEntries = node.isLeafNode() ? node.getLeaveEntries() : node.getNodeEntries();
 
     Node newNode = new Node();
     newNode.setParent(parent);
+    newNode.setId(UUID.randomUUID().toString());
 
-    // reset entries
     if (node.isLeafNode()) {
       // new node should be a leaf node too
       newNode.setIsLeaf(true);
-      node.getLeaveEntries().clear();
-    } else {
-      node.getNodeEntries().clear();
     }
 
     // distribute M + 1 entries to node & newNode
     quadraticSplit(node, newNode, currentEntries);
-    adjustPath(node);
 
     parent.getNodeEntries().add(newNode);
+
+    adjustPath(node);
+    adjustPath(newNode);
 
     // split parent if needed
     if (parent.getNodeEntries().size() > maxEntry) {
@@ -103,11 +117,11 @@ public class RTree {
     entries.remove(seed1);
     entries.remove(seed2);
 
-    double expansion = 0;
 
     // loop through M-1 remaining entries
     // find the entry with min dead space if add to the two groups
     while(!entries.isEmpty()) {
+      double expansion = 0;
       BoundedObject bestSeed = null;
       List<BoundedObject> bestGroup;
 
@@ -131,8 +145,6 @@ public class RTree {
           expansion = deadSpace2 - deadSpace1;
         }
       }
-
-      assert bestSeed != null;
 
       List<BoundedObject> mergedGroup1WithBestSeed = new ArrayList<>(groupEntries1);
       List<BoundedObject> mergedGroup2WithBestSeed = new ArrayList<>(groupEntries2);
@@ -191,6 +203,7 @@ public class RTree {
   }
 
   private void adjustPath(Node node) {
+    // return if meet root node
     if (node.getParent() == null) return;
 
     node.calculateBBox();
@@ -208,8 +221,7 @@ public class RTree {
       double enlargementNeeded = nodeEntry.getBBox().calculateEnlargement(entry.getBBox());
       double currentArea = nodeEntry.getBBox().getArea();
 
-      if (nodeEntry.getBBox().contains(entry.getBBox()) || enlargementNeeded < minEnlargement
-          || currentArea < minArea) {
+      if (enlargementNeeded < minEnlargement || enlargementNeeded == minEnlargement && currentArea < minArea) {
         node = nodeEntry;
         minArea = currentArea;
         minEnlargement = enlargementNeeded;
@@ -217,5 +229,19 @@ public class RTree {
     }
 
     return node;
+  }
+
+  private int countEntries(Node node) {
+    if (node.isLeafNode()) return node.getLeaveEntries().size();
+
+    List<Node> nodeEntries = node.getNodeEntries();
+
+    int tmp = 0;
+
+    for (Node entry : nodeEntries) {
+      tmp += countEntries(entry);
+    }
+
+    return tmp;
   }
 }
